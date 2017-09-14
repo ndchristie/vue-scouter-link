@@ -5,6 +5,15 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## 1.0.1 - 2017-9-14
+### Added
+- .npmignore
+
+### Fixed
+- Missing main file in npm package
+
+## 1.0.0 - 2017-9-14
 ### Added
 - Vue Scouter Link component that
 - Looks to see whether it should be used as a Vue Router Link
