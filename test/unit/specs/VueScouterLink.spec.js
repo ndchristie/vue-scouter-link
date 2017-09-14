@@ -51,6 +51,17 @@ describe('Vue App', () => {
         }).vm.$el.should.match('a[href^="http://"]')
           .and.match('[href*="google.com"]');
       });
+
+      it('Respects router-link props if router-link is registered', () => {
+        Object.keys(wrapper.vm.$options.props)
+          .should.contain(
+            ...Object.keys(
+              Vue.options.components['router-link'].options.props,
+            ),
+          );
+
+        wrapper = avoriaz.mount(VueScouterLink, defaultOptions);
+      });
     });
   });
 });
