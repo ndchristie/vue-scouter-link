@@ -3,7 +3,7 @@
     class="vue-scouter-link"
     v-bind="computedProps"
     @click.native="scrollToIfFound"
-  />
+  ></component>
 </template>
 
 <script>
