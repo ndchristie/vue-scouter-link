@@ -62,6 +62,39 @@ describe('Vue App', () => {
 
         wrapper = avoriaz.mount(VueScouterLink, defaultOptions);
       });
+
+      it('Can tell if routes match and if a matching anchor is present', () => {
+        const warn = sinon.stub(Vue.util, 'warn');
+        should.not.exist(VueScouterLink.computed.targetEl());
+        should.not.exist(VueScouterLink.computed.atTargetRoute());
+        warn.should.have.been.calledTwice;
+        warn.restore();
+
+        wrapper = avoriaz.mount(VueScouterLink, {
+          router,
+          propsData: {
+            to: '/path#distant-child',
+          },
+        });
+        const distantChild = document.createElement('div');
+        distantChild.id = 'distant-child';
+        distantChild.style.marginTop = '100000px';
+        document.body.appendChild(distantChild);
+
+        wrapper.vm.targetEl
+          .should.be.a('string').that.equals('#distant-child');
+        wrapper.vm.atTargetRoute
+          .should.be.a('boolean').that.is.true;
+
+        wrapper = avoriaz.mount(VueScouterLink, {
+          router,
+          propsData: {
+            to: '/goober#not-a-child',
+          },
+        });
+
+        should.not.exist(wrapper.vm.targetEl);
+      });
     });
   });
 });

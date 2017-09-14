@@ -8,3 +8,5 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Added
 - Vue Scouter Link component that
 - Looks to see whether it should be used as a Vue Router Link
+- Looks to see whether a matching anchor exists in matching route
+

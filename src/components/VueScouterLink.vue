@@ -48,5 +48,23 @@
           ...this.$options.propsData,
         };
       },
+      atTargetRoute() {
+        if (!this.$el) {
+          Vue.util.warn('Cannot compare target route of Scouter Link before component has mounted.');
+          return null;
+        }
+        return (
+          this.$el.origin === window.location.origin
+          && this.$el.pathname === window.location.pathname
+        );
+      },
+      targetEl() {
+        if (!this.$el) {
+          Vue.util.warn('Cannot get target element of Scouter Link before component has mounted.');
+          return null;
+        }
+        return this.atTargetRoute ? this.$el.hash.replace(/\?.*$/, '') : null;
+      },
+    },
   };
 </script>
