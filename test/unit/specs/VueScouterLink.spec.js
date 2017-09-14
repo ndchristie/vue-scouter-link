@@ -95,6 +95,40 @@ describe('Vue App', () => {
 
         should.not.exist(wrapper.vm.targetEl);
       });
+
+      it('Scrolls to an element if it appears on the page', () => {
+        wrapper = avoriaz.mount(VueScouterLink, {
+          router,
+          propsData: {
+            to: '/path#distant-child',
+          },
+        });
+        const distantChild = document.createElement('div');
+        distantChild.id = 'distant-child';
+        distantChild.style.marginTop = '100000px';
+        document.body.appendChild(distantChild);
+
+        let ownMethod = sinon.spy(wrapper.vm, 'scrollToIfFound');
+        let inheritedMethod = sinon.spy(wrapper.vm, '$scrollTo');
+        wrapper.vm.$el.click();
+        ownMethod.should.have.been.called;
+        inheritedMethod.should.have.been.called;
+
+        wrapper = avoriaz.mount(VueScouterLink, {
+          router,
+          propsData: {
+            to: '/goober#not-a-child',
+          },
+        });
+
+        should.not.exist(wrapper.vm.targetEl);
+
+        ownMethod = sinon.spy(wrapper.vm, 'scrollToIfFound');
+        inheritedMethod = sinon.spy(wrapper.vm, '$scrollTo');
+        wrapper.vm.$el.click();
+        ownMethod.should.have.been.calledOnce;
+        inheritedMethod.should.not.have.been.calledOnce;
+      });
     });
   });
 });

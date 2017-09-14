@@ -66,5 +66,18 @@
         return this.atTargetRoute ? this.$el.hash.replace(/\?.*$/, '') : null;
       },
     },
+    methods: {
+      scrollToIfFound(event, options) {
+        if (this.targetEl && document.querySelector(this.targetEl)) {
+          /* istanbul ignore if */// can't reimport middleware
+          if (!this.$scrollTo) {
+            Vue.util.warn('Must call Vue.use(VueScrollto) before importing scouter-link to include Vue Scrollto functionality.');
+          } else {
+            event.preventDefault();
+            this.$scrollTo(this.targetEl, undefined, { options });
+          }
+        }
+      },
+    },
   };
 </script>
