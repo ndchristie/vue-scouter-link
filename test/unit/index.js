@@ -1,6 +1,10 @@
 import Vue from 'vue';
+import Router from 'vue-router';
+import VueScrollto from 'vue-scrollto';
 
 Vue.config.productionTip = false;
+Vue.use(Router);
+Vue.use(VueScrollto);
 
 // require all test files (files that ends with .spec.js)
 const testsContext = require.context('./specs', true, /\.spec$/);
