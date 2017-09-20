@@ -2,8 +2,11 @@
   <component
     class="vue-scouter-link"
     v-bind="computedProps"
+    @click="scrollToIfFound"
     @click.native="scrollToIfFound"
-  ></component>
+  >
+    <slot></slot>
+  </component>
 </template>
 
 <script>
@@ -16,12 +19,11 @@
     },
   };
 
-  /* eslint-disable no-underscore-dangle */
-  /* istanbul ignore else */// can't reimport middleware
-  if (
-    Array.isArray(Vue._installedPlugins)
-    && Vue._installedPlugins.some(({ name }) => name === 'VueRouter') > -1
-  ) {
+  try {
+    require.resolve('vue-router');
+    // eslint-disable-next-line global-require
+    const Router = require('vue-router');
+    Vue.use(Router);
     Object.assign(props, {
       useVueRouter: {
         type: Boolean,
@@ -29,10 +31,10 @@
       },
       ...Vue.options.components['router-link'].options.props,
     });
-  } else {
-    Vue.util.warn('Must call Vue.use(VueRouter) before importing scouter-link to include Vue Router functionality.');
+  } catch (err) {
+    Vue.util.warn(err);
+    Vue.util.warn('Must import Vue Router before importing scouter-link to include Vue Router functionality.');
   }
-  /* eslint-enable no-underscore-dangle */
 
   export default {
     name: 'vue-scouter-link',
@@ -48,7 +50,7 @@
           ...this.$options.propsData,
         };
       },
-      atTargetRoute() {
+      atTargetRoute: function atTargetRoute() {
         if (!this.$el) {
           Vue.util.warn('Cannot compare target route of Scouter Link before component has mounted.');
           return null;
@@ -58,24 +60,44 @@
           && this.$el.pathname === window.location.pathname
         );
       },
-      targetEl() {
+      targetEl: function targetEl() {
         if (!this.$el) {
           Vue.util.warn('Cannot get target element of Scouter Link before component has mounted.');
           return null;
         }
-        return this.atTargetRoute ? this.$el.hash.replace(/\?.*$/, '') : null;
+        const res = this.atTargetRoute ? this.$el.hash.replace(/\?.*$/, '') : null;
+        return res !== '' ? res : '#app';
       },
     },
     methods: {
-      scrollToIfFound(event, options) {
-        if (this.targetEl && document.querySelector(this.targetEl)) {
-          /* istanbul ignore if */// can't reimport middleware
-          if (!this.$scrollTo) {
-            Vue.util.warn('Must call Vue.use(VueScrollto) before importing scouter-link to include Vue Scrollto functionality.');
-          } else {
-            event.preventDefault();
-            this.$scrollTo(this.targetEl, undefined, { options });
-          }
+      scrollToIfFound($event, options) {
+        /* istanbul ignore else */
+        if (this.$scrollTo) {
+          let trackingAttempts = 10;
+          let elementY = null;
+          let previousY = null;
+          let found = false;
+          const trackElementY = () => {
+            trackingAttempts -= 1;
+            const $targetEl = this.targetEl && this.targetEl.length > 0 ? document.querySelector(this.targetEl) : 'body';
+            if ($targetEl) {
+              found = true;
+              previousY = elementY;
+              if (elementY !== $targetEl.offsetTop) {
+                elementY = $targetEl.offsetTop;
+                if (typeof this.cancel === 'function') this.cancel();
+                this.cancel = this.$scrollTo($targetEl, undefined, options);
+              }
+            } else {
+              window.scrollTop = 0;
+            }
+            setTimeout(() => {
+              if (trackingAttempts > 0 && (!found || previousY !== elementY)) {
+                trackElementY();
+              }
+            }, 1000 / 15);
+          };
+          trackElementY();
         }
       },
     },

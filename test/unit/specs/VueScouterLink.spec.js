@@ -127,7 +127,7 @@ describe('Vue App', () => {
         inheritedMethod = sinon.spy(wrapper.vm, '$scrollTo');
         wrapper.vm.$el.click();
         ownMethod.should.have.been.calledOnce;
-        inheritedMethod.should.not.have.been.calledOnce;
+        inheritedMethod.should.have.been.calledOnce;
       });
     });
   });
